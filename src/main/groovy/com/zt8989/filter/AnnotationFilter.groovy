@@ -7,7 +7,9 @@ import org.eclipse.jdt.core.dom.Annotation
 import org.eclipse.jdt.core.dom.MemberValuePair
 import org.eclipse.jdt.core.dom.NormalAnnotation
 import org.eclipse.jdt.core.dom.StringLiteral
-import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Predicate;
 
@@ -16,6 +18,7 @@ import java.util.function.Predicate;
  * @Date 2022/4/2
  */
 public class AnnotationFilter extends BaseFilter implements Predicate<StringLiteral> {
+    private final Logger logger = LoggerFactory.getLogger(AnnotationFilter.class.name)
 
     List<Tuple2<String, String>> excludeAnnotationList = [
             new Tuple2("AssertFalse", "message"),
@@ -53,8 +56,8 @@ public class AnnotationFilter extends BaseFilter implements Predicate<StringLite
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){
         def res = closure.call(stringLiteral)
         if(!res){
-            println("[${AnnotationFilter.class.name}] 过滤: " + stringLiteral.literalValue)
-            println("[${AnnotationFilter.class.name}] 过滤原因: 存在用注解中" )
+            logger.info("过滤: {}", stringLiteral.literalValue)
+            logger.info("过滤原因: 存在用注解中" )
         }
         return res
     }

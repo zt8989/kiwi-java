@@ -7,6 +7,8 @@ import org.eclipse.jdt.core.dom.FieldAccess
 import org.eclipse.jdt.core.dom.MethodInvocation
 import org.eclipse.jdt.core.dom.SimpleName
 import org.eclipse.jdt.core.dom.StringLiteral
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.function.Predicate
 
@@ -14,7 +16,7 @@ import java.util.function.Predicate
  * @author zhouteng* @Date 2022/4/1
  */
 class LogInfoFilter extends BaseFilter implements Predicate<StringLiteral> {
-
+    private final Logger logger = LoggerFactory.getLogger(LogInfoFilter.class.name)
     List<Closure<StringLiteral>> listeners = []
 
     LogInfoFilter(Config config) {
@@ -24,8 +26,8 @@ class LogInfoFilter extends BaseFilter implements Predicate<StringLiteral> {
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){
         def res = closure.call(stringLiteral)
         if(!res){
-            println("[${LogInfoFilter.class.name}] 过滤: " + stringLiteral.literalValue)
-            println("[${LogInfoFilter.class.name}] 过滤原因: 使用log调用")
+            logger.info("过滤: {}", stringLiteral.literalValue)
+            logger.info("过滤原因: 使用log调用")
             listeners.each { it.call(stringLiteral) }
         }
         return res

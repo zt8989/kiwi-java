@@ -2,33 +2,22 @@ package com.zt8989
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
-import com.zt8989.bean.ConfigDto
 import com.zt8989.config.Config
-import com.zt8989.filter.AnnotationFilter
-import com.zt8989.filter.ConstantFilter
-import com.zt8989.filter.EnumFilter
-import com.zt8989.filter.I18nFilter
-import com.zt8989.filter.LogInfoFilter
-import com.zt8989.filter.MainFilter
-import com.zt8989.filter.MethodFilter
-import com.zt8989.filter.RegexpFilter
-import com.zt8989.filter.StringEqualsFilter
-import com.zt8989.transform.AbstractTransform
-import com.zt8989.transform.AnnotationTransform
-import com.zt8989.transform.ConcatStringTransform
-import com.zt8989.transform.FieldStringTransform
-import com.zt8989.transform.MessageFormatTransform
-import com.zt8989.transform.StringTransform
-import com.zt8989.translator.CachedKeyTranslator
+import com.zt8989.filter.*
+import com.zt8989.transform.*
 import com.zt8989.translator.Translator
 import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.StringLiteral
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
 import org.eclipse.jface.text.Document
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.function.Predicate
 
 public class Kiwi {
+    private final Logger logger = LoggerFactory.getLogger(Kiwi.class.name)
+
     public static void main(String[] args) {
         def config = Config.from(args)
         def runners = config.build()
@@ -67,7 +56,7 @@ public class Kiwi {
         if(filter != null){
             filter.listeners.add({ StringLiteral it ->
                 if(keyMap.containsKey(it.literalValue)){
-                    println("find key: " + it.literalValue)
+                    logger.info("find key: {}", it.literalValue)
                     keyMap.remove(it.literalValue)
                 }
             })
@@ -103,7 +92,7 @@ public class Kiwi {
         filters.add(new MethodFilter(config, result))
         def list = getTransList(parser, result, filters, file)
         if(list.size() > 0){
-            println("processing file: " + file)
+            logger.info("processing file: {}", file)
             appendImport(parser, result, rewrite)
             transforms.forEach({
                 list = it.transform(list)
@@ -133,8 +122,8 @@ public class Kiwi {
             translateList = translateList.findAll{ filter.test(it) }
         })
         if(originTranslateList.size() != translateList.size()){
-            println(file)
-            println("filtered " + (originTranslateList.size() - translateList.size()) + " strings")
+            logger.info(file)
+            logger.info("filtered {} strings", (originTranslateList.size() - translateList.size()))
         }
         return translateList
     }

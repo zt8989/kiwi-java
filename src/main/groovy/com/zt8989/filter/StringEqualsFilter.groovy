@@ -5,6 +5,8 @@ import com.zt8989.config.Config
 import com.zt8989.util.AstUtils
 import org.eclipse.jdt.core.dom.MethodInvocation
 import org.eclipse.jdt.core.dom.StringLiteral
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.function.Predicate
 
@@ -14,6 +16,7 @@ import java.util.function.Predicate
  * @Date 2022/4/7
  */
 class StringEqualsFilter extends BaseFilter implements Predicate<StringLiteral> {
+    private final Logger logger = LoggerFactory.getLogger(StringEqualsFilter.class.name)
     StringEqualsFilter(Config config) {
         super(config)
     }
@@ -21,8 +24,8 @@ class StringEqualsFilter extends BaseFilter implements Predicate<StringLiteral> 
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){
         def res = closure.call(stringLiteral)
         if(!res){
-            println("[${StringEqualsFilter.class.name}] 过滤: " + stringLiteral.literalValue)
-            println("[${StringEqualsFilter.class.name}] 过滤原因: 匹配到字符串.equals方法")
+            logger.info("过滤: {}", stringLiteral.literalValue)
+            logger.info("过滤原因: 匹配到字符串.equals方法")
         }
         return res
     }

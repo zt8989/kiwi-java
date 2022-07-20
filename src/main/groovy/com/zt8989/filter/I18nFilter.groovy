@@ -5,7 +5,9 @@ import com.zt8989.config.Config
 import org.eclipse.jdt.core.dom.MethodInvocation
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.StringLiteral
-import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Predicate;
 
@@ -14,6 +16,7 @@ import java.util.function.Predicate;
  * @Date 2022/4/6
  */
 public class I18nFilter extends BaseFilter implements Predicate<StringLiteral> {
+    private final Logger logger = LoggerFactory.getLogger(I18nFilter.class.name)
 
     I18nFilter(Config config) {
         super(config)
@@ -22,8 +25,8 @@ public class I18nFilter extends BaseFilter implements Predicate<StringLiteral> {
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){
         def res = closure.call(stringLiteral)
         if(!res){
-            println("[${I18nFilter.class.name}] 过滤: " + stringLiteral.literalValue)
-            println("[${I18nFilter.class.name}] 过滤原因: 使用调用${config.getI18nClass()}")
+            logger.info("过滤: {}", stringLiteral.literalValue)
+            logger.info("过滤原因: 使用调用 {}", config.getI18nClass())
         }
         return res
     }

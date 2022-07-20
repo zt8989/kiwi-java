@@ -5,6 +5,8 @@ import com.zt8989.config.Config
 import com.zt8989.util.AstUtils
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.StringLiteral
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.function.Predicate
 
@@ -13,6 +15,7 @@ import java.util.function.Predicate
  * @Date 2022/4/7
  */
 class MainFilter extends BaseFilter implements Predicate<StringLiteral> {
+    private final Logger logger = LoggerFactory.getLogger(MainFilter.class.name)
     MainFilter(Config config) {
         super(config)
     }
@@ -20,8 +23,8 @@ class MainFilter extends BaseFilter implements Predicate<StringLiteral> {
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){
         def res = closure.call(stringLiteral)
         if(!res){
-            println("[${MainFilter.class.name}] 过滤: " + stringLiteral.literalValue)
-            println("[${MainFilter.class.name}] 过滤原因: 匹配main方法")
+            logger.info("过滤: {}", stringLiteral.literalValue)
+            logger.info("过滤原因: 匹配main方法")
         }
         return res
     }

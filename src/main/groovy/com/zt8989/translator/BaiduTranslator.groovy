@@ -6,8 +6,11 @@ import groovy.json.JsonSlurper
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 public class BaiduTranslator implements Translator {
+    private final Logger logger = LoggerFactory.getLogger(BaiduTranslator.class.name)
     final String url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
     final String from = 'zh'
     final String to = 'en'
@@ -36,12 +39,12 @@ public class BaiduTranslator implements Translator {
             .url(url)
             .post(body)
             .build()
-        println("[${BaiduTranslator.class.name}] query: " + cn)
+        logger.info("query: {}", cn)
         def response
         try{
             response = okHttpClient.newCall(request).execute()
             def json = jsonSlurper.parse(response.body().bytes())
-            println("[${BaiduTranslator.class.name}] result: " + json.toString())
+            logger.info("result: {}", json)
             def translate = new TranslateResultDto(json)
             response.close()
             return Optional.ofNullable(translate).map(it -> it.trans_result)

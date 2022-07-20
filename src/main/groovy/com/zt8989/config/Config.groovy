@@ -24,7 +24,7 @@ import java.nio.file.Paths
  * @Date 2022/4/1
  */
 class Config {
-    static final logger = LoggerFactory.getLogger(Config.class.name)
+    private static final logger = LoggerFactory.getLogger(Config.class.name)
 
     static final var DOUBLE_BYTE_REGEX = /[^\x00-\xff]/
     ConfigDto configDto;
@@ -79,8 +79,8 @@ class Config {
             )
             def filters = Kiwi.getDefaultFilters(this)
             def path = Paths.get(baseUrl, module.path)
-            println("module path: " + path)
-            println("message path: " + module.messageLocation)
+            logger.info("module path: {}", path)
+            logger.info("message path: {}", module.messageLocation)
             def resourceLoader = new ResourceLoader(Paths.get(baseUrl, module.messageLocation, "messages_zh_CN.properties").toFile().path)
             def fileWalker = new FileWalker(location: path, excludeList: fileExcludes)
             translateList.add(new Kiwi(

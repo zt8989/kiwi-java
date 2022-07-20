@@ -7,6 +7,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.StringLiteral
 import org.eclipse.jdt.core.dom.TypeDeclaration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.util.function.Predicate
 
@@ -14,6 +16,7 @@ import java.util.function.Predicate
  * @author zhouteng* @Date 2022/4/2
  */
 class MethodFilter extends BaseFilter implements Predicate<StringLiteral> {
+    private final Logger logger = LoggerFactory.getLogger(MethodFilter.class.name)
     final var methodComment = "kiwi-disable-method"
     CompilationUnit compilationUnit
     List<Comment> comments
@@ -26,8 +29,8 @@ class MethodFilter extends BaseFilter implements Predicate<StringLiteral> {
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){
         def res = closure.call(stringLiteral)
         if(!res){
-            println("[${MethodFilter.class.name}] 过滤: " + stringLiteral.literalValue)
-            println("[${MethodFilter.class.name}] 过滤原因: 包含注释: " + methodComment)
+            logger.info("过滤: {}", stringLiteral.literalValue)
+            logger.info("过滤原因: 包含注释: {}", methodComment)
         }
         return res
     }
