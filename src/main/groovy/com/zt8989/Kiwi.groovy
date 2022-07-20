@@ -121,7 +121,7 @@ public class Kiwi {
         def list = parser.visitImport(unit, config)
         if(list.size() == 0){
             def importDeclaration = ast.newImportDeclaration()
-            importDeclaration.setName(ast.newName(Config.i18nImportClass))
+            importDeclaration.setName(ast.newName(config.i18nImportClass))
             rewrite.getListRewrite(unit, CompilationUnit.IMPORTS_PROPERTY).insertLast(importDeclaration, null)
         }
     }
