@@ -14,7 +14,7 @@ import java.util.function.Predicate
  */
 class RegexpFilter extends BaseFilter implements Predicate<StringLiteral> {
     private final Logger logger = LoggerFactory.getLogger(RegexpFilter.class.name)
-    static final var REGEXP = ~/^[\s【】。, ，：()\\（）；、{}\d“”—<>]+$/
+    static final var REGEXP = ~/^[\s【】。, ，：()\\（）；、{}\d“”—–<>？！’‘…￥]+$/
 
     RegexpFilter(Config config) {
         super(config)

@@ -1,5 +1,6 @@
 package com.zt8989.transform
 
+import com.zt8989.bean.MuteInt
 import com.zt8989.config.Config
 import com.zt8989.translator.Translator
 import com.zt8989.util.AstUtils
@@ -17,9 +18,20 @@ class MessageFormatTransform extends AbstractTransform{
         super(astRewrite, compilationUnit, translator, config)
     }
 
+    String replaceMessageFormatWithI18nFormat(String message){
+        def count = 0
+        return message.replaceAll(/\{}/){
+            "{${count++}}"
+        }
+    }
+
     void replaceMessageFormatWithI18n(MethodInvocation methodInvocation, StringLiteral stringLiteral){
         def args = []
         StringLiteral code = ASTNode.copySubtree(methodInvocation.getAST(), stringLiteral)
+        def value = code.getEscapedValue()
+        value = replaceMessageFormatWithI18nFormat(value)
+        code.setEscapedValue(value)
+
         translateKey(code)
 
         List<ASTNode> retainExp = methodInvocation.arguments().subList(1, methodInvocation.arguments().size())
