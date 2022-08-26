@@ -48,7 +48,7 @@ public class BaiduTranslator implements Translator {
             def translate = new TranslateResultDto(json)
             response.close()
             return Optional.ofNullable(translate).map(it -> it.trans_result)
-                    .map(it -> it[0]).map(it -> it.dst)
+                    .map(it -> it.collect {it.dst}).map(it -> it.join("\n"))
         } catch(SocketTimeoutException e) {
             response?.close()
             return Optional.empty()
