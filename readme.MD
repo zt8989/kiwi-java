@@ -66,6 +66,9 @@ fileExcludes:
 
 chineseExcludes:
   - "测试"
+
+joiner: _
+prefix: biz.
 ```
 
 | 字段                      | 解释                  |
@@ -75,10 +78,12 @@ chineseExcludes:
 | modules                 | 模块数组                |
 | modules.path            | 模块路径                |
 | modules.messageLocation | 模块消息路径              |
-| i18nImportClass | i18N class位置        |
-| fileExcludes | 排除的java文件           |
-| chineseExcludes | 需要排除翻译的的中文          |
-| preLoadMessages | 预加载翻译资源，可以是其他模块下的资源 |
+| i18nImportClass         | i18N class位置        |
+| fileExcludes            | 排除的java文件           |
+| chineseExcludes         | 需要排除翻译的的中文          |
+| preLoadMessages         | 预加载翻译资源，可以是其他模块下的资源 |
+| joiner                  | 连接器，默认是_, abc_def   |
+| prefix                  | 前缀，默认是空，biz.abc.efg |
 
 ## 国际化工具类
 国际化工具类必须实现这两个方法
