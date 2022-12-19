@@ -1,5 +1,7 @@
 package com.zt8989.translator
 
+import com.zt8989.exception.NoTranslateFoundException
+
 /**
  * @author zhouteng
  * @Date 2022/4/6
@@ -38,6 +40,6 @@ class KeyTranslator implements Translator{
             def key = getKey(keys)
             return Optional.of(key)
         }
-        throw new Error("no translate key found for " + cn)
+        throw new NoTranslateFoundException("no translate key found for " + cn)
     }
 }

@@ -50,7 +50,7 @@ class MessageFormatTransform extends AbstractTransform{
 
     @Override
     List<StringLiteral> transform(List<StringLiteral> stringLiterals) {
-        def cloneList = stringLiterals.clone()
+        def cloneList = stringLiterals.collect()
         for(stringLiteral in stringLiterals){
             def methodInvocation = AstUtils.lookupCallerName(stringLiteral) {
                 it == "MessageFormat"

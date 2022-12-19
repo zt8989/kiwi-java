@@ -74,7 +74,9 @@ public class FieldStringTransform extends AbstractTransform {
         for(stringLiteral in stringLiterals){
             def field = isFieldDeclaration(stringLiteral);
             if(field.isPresent()){
-                transformFieldToGetMethod(field.get(), stringLiteral);
+                if(config.configDto.fieldTranslate){
+                    transformFieldToGetMethod(field.get(), stringLiteral);
+                }
                 cloneList.remove(stringLiteral);
             }
         }

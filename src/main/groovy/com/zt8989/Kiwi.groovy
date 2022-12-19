@@ -51,7 +51,11 @@ public class Kiwi {
 
     void run(){
         def paths = this.fileWalker.match()
-        keyMap.putAll(HashBiMap.create(resourceLoader.loadProperties()).inverse())
+        try {
+            keyMap.putAll(HashBiMap.create(resourceLoader.loadProperties()).inverse())
+        } catch(IllegalArgumentException e){
+            throw new RuntimeException("预加载中是否包含相同的key, 且对应的中文不一致", e)
+        }
         def filter = this.filters.find(it -> it instanceof LogInfoFilter) as LogInfoFilter
         if(filter != null){
             filter.listeners.add({ StringLiteral it ->
