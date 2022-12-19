@@ -24,7 +24,12 @@ class ResourceLoader {
     }
 
     void saveProperties(Map<String, String> map){
-        Properties properties = new Properties()
+        Properties properties = new Properties() {
+            @Override
+            public synchronized Enumeration<Object> keys() {
+                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+            }
+        }
         properties.putAll(map)
         new File(file).withWriter("UTF-8"){
             properties.store(it, "")

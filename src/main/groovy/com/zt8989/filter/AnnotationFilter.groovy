@@ -43,6 +43,7 @@ public class AnnotationFilter extends BaseFilter implements Predicate<StringLite
             new Tuple2("Positive", "message"),
             new Tuple2("PositiveOrZero", "message"),
             new Tuple2("Size", "message"),
+            new Tuple2("Length", "message"),
     ]
 
     AnnotationFilter(Config config) {

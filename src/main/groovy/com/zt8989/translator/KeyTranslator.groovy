@@ -11,9 +11,13 @@ class KeyTranslator implements Translator{
     private final String EN_EXP = /[a-zA-Z]+/
     Integer maxLength = 50
     Integer maxKeyWordCount = 10
+    String joiner
+    String prefix
 
-    KeyTranslator(Translator translator) {
+    KeyTranslator(Translator translator, String joiner, String prefix) {
         this.translator = translator;
+        this.joiner = joiner
+        this.prefix = prefix
     }
 
     List<String> translateKeys(String cn){
@@ -28,10 +32,10 @@ class KeyTranslator implements Translator{
 
     String getKey(List<String> keys){
         def newKeys = keys.collect()
-        while (newKeys.size() > maxKeyWordCount &&  newKeys.join("_").length() > maxLength){
+        while (newKeys.size() > maxKeyWordCount &&  newKeys.join(joiner).length() > maxLength){
             newKeys.remove(newKeys.size() - 1)
         }
-        return newKeys.join("_")
+        return prefix + newKeys.join(joiner)
     }
 
     Optional<String> translate(String cn) {

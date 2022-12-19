@@ -12,5 +12,31 @@ class ConfigDto {
     List<String> fileExcludes = []
     List<String> chineseExcludes = []
     List<String> preLoadMessages = []
-    boolean fieldTranslate = true
+    boolean fieldTranslate = false
+    String joiner;
+    String prefix;
+
+    String getJoiner(){
+        return joiner?:"_"
+    }
+
+    String getPrefix(){
+        return prefix?:""
+    }
+
+    boolean getFieldTranslate(){
+        return fieldTranslate?:false
+    }
+
+    List<String> getChineseExcludes(){
+        return chineseExcludes?:[]
+    }
+
+    List<String> getFileExcludes(){
+        return fileExcludes?:[]
+    }
+
+    List<String> getPreLoadMessages(){
+        return preLoadMessages?:[]
+    }
 }

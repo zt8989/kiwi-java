@@ -71,7 +71,9 @@ class Config {
             def translator = new CachedKeyTranslator(
                     new MessageSourcesTranslator(
                             new KeyTranslator(
-                                    new BaiduTranslator(this)
+                                    new BaiduTranslator(this),
+                                    yaml.joiner,
+                                    yaml.prefix
                             ),
                             fileLists
                     ),
