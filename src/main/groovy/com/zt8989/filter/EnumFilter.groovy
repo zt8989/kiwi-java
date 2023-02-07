@@ -14,7 +14,7 @@ import java.util.function.Predicate
  * @author zhouteng
  * @Date 2022/4/14
  */
-class EnumFilter extends BaseFilter implements Predicate<StringLiteral>{
+class EnumFilter extends BaseFilter {
     private final Logger logger = LoggerFactory.getLogger(EnumFilter.class.name)
     EnumFilter(Config config) {
         super(config)
@@ -29,8 +29,8 @@ class EnumFilter extends BaseFilter implements Predicate<StringLiteral>{
         return res
     }
 
-    boolean test(StringLiteral stringLiteral) {
-        return intercept(stringLiteral){ !isEnumConstant(stringLiteral) }
+    boolean test(Tuple2<StringLiteral, String> node) {
+        return intercept(node.getV1()){ !isEnumConstant(it) }
     }
 
     boolean isEnumConstant(StringLiteral stringLiteral) {

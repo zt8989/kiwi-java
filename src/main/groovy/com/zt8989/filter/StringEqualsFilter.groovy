@@ -15,7 +15,7 @@ import java.util.function.Predicate
  * @author zhouteng
  * @Date 2022/4/7
  */
-class StringEqualsFilter extends BaseFilter implements Predicate<StringLiteral> {
+class StringEqualsFilter extends BaseFilter {
     private final Logger logger = LoggerFactory.getLogger(StringEqualsFilter.class.name)
     StringEqualsFilter(Config config) {
         super(config)
@@ -31,8 +31,8 @@ class StringEqualsFilter extends BaseFilter implements Predicate<StringLiteral> 
     }
 
     @Override
-    boolean test(StringLiteral stringLiteral) {
-        return intercept(stringLiteral) {
+    boolean test(Tuple2<StringLiteral, String> node) {
+        return intercept(node.getV1()) {
             !hasStringEquals(it)
         }
     }

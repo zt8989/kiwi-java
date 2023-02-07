@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * @author zhouteng
  * @Date 2022/4/6
  */
-public class I18nFilter extends BaseFilter implements Predicate<StringLiteral> {
+public class I18nFilter extends BaseFilter  {
     private final Logger logger = LoggerFactory.getLogger(I18nFilter.class.name)
 
     I18nFilter(Config config) {
@@ -31,8 +31,8 @@ public class I18nFilter extends BaseFilter implements Predicate<StringLiteral> {
         return res
     }
 
-    boolean test(StringLiteral stringLiteral) {
-        def res = intercept(stringLiteral) {
+    boolean test(Tuple2<StringLiteral, String> node) {
+        def res = intercept(node.getV1()) {
             !lookupUntil(it)
         }
         return res

@@ -26,8 +26,15 @@ class OptionUtils {
                 .desc("default current work dir")
                 .build()
 
+        def diffRef = Option.builder("diffRef")
+                .argName("diffRef")
+                .hasArgs()
+                .desc("diff with branch[develop]")
+                .build()
+
         options.addOption(config)
         options.addOption(baseUrl)
+        options.addOption(diffRef)
         def cmd = parser.parse(options, args)
         return cmd
     }

@@ -14,7 +14,7 @@ import java.util.function.Predicate
  * @author zhouteng
  * @Date 2022/4/7
  */
-class MainFilter extends BaseFilter implements Predicate<StringLiteral> {
+class MainFilter extends BaseFilter  {
     private final Logger logger = LoggerFactory.getLogger(MainFilter.class.name)
     MainFilter(Config config) {
         super(config)
@@ -30,8 +30,8 @@ class MainFilter extends BaseFilter implements Predicate<StringLiteral> {
     }
 
     @Override
-    boolean test(StringLiteral stringLiteral) {
-        return intercept(stringLiteral) {
+    boolean test(Tuple2<StringLiteral, String> node) {
+        return intercept(node.getV1()) {
             !isMainMethod(it)
         }
     }

@@ -24,7 +24,7 @@ public class Kiwi {
         runners.each {it.run() }
     }
 
-    private List<Predicate<StringLiteral>> filters = []
+    private List<BaseFilter> filters = []
     private List<AbstractTransform> transforms = []
     private Translator translator;
     private ResourceLoader resourceLoader;
@@ -32,7 +32,7 @@ public class Kiwi {
     private Config config;
     private BiMap<String, String> keyMap;
 
-    static List<Predicate<StringLiteral>> getDefaultFilters(Config config){
+    static List<BaseFilter> getDefaultFilters(Config config){
        return [new LogInfoFilter(config), new AnnotationFilter(config), new RegexpFilter(config),
                new I18nFilter(config), new EnumFilter(config),
                new StringEqualsFilter(config), new MainFilter(config),
@@ -40,7 +40,7 @@ public class Kiwi {
        ]
     }
 
-    Kiwi(Translator translator, ResourceLoader resourceLoader, FileWalker fileWalker, List<Predicate<StringLiteral>> filters, Config config, BiMap<String, String> keyMap){
+    Kiwi(Translator translator, ResourceLoader resourceLoader, FileWalker fileWalker, List<BaseFilter> filters, Config config, BiMap<String, String> keyMap){
         this.translator = translator
         this.resourceLoader = resourceLoader
         this.fileWalker = fileWalker
@@ -52,7 +52,9 @@ public class Kiwi {
     void run(){
         def paths = this.fileWalker.match()
         try {
-            keyMap.putAll(HashBiMap.create(resourceLoader.loadProperties()).inverse())
+
+            def inverseMap = HashBiMap.create(resourceLoader.loadProperties()).inverse()
+            inverseMap.entrySet().forEach { keyMap.forcePut(it.key, it.value) }
         } catch(IllegalArgumentException e){
             throw new RuntimeException("预加载中是否包含相同的key, 且对应的中文不一致", e)
         }
@@ -92,8 +94,11 @@ public class Kiwi {
                 new FieldStringTransform(rewrite, result, translator, config),
                 new StringTransform(rewrite, result, translator, config),
         ]
-        def filters = this.filters.collect()
+        def filters = []
+
+        filters.addAll(this.filters.collect())
         filters.add(new MethodFilter(config, result))
+
         def list = getTransList(parser, result, filters, file)
         if(list.size() > 0){
             logger.info("processing file: {}", file)
@@ -119,11 +124,11 @@ public class Kiwi {
         }
     }
 
-    def getTransList(Parser parser, CompilationUnit result, List<Predicate<StringLiteral>> filters, String file){
+    def getTransList(Parser parser, CompilationUnit result, List<BaseFilter> filters, String file){
         var originTranslateList = parser.visitChineseText(result)
         var translateList = originTranslateList.collect()
         filters.forEach(filter -> {
-            translateList = translateList.findAll{ filter.test(it) }
+            translateList = translateList.findAll{ filter.test(new Tuple2(it, file)) }
         })
         if(originTranslateList.size() != translateList.size()){
             logger.info(file)

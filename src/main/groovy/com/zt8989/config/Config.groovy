@@ -8,6 +8,7 @@ import com.zt8989.ResourceLoader
 import com.zt8989.bean.ConfigDto
 import com.zt8989.bean.MessageModule
 import com.zt8989.filter.ConstantFilter
+import com.zt8989.filter.GitDiffFilter
 import com.zt8989.translator.BaiduTranslator
 import com.zt8989.translator.CachedKeyTranslator
 import com.zt8989.translator.KeyTranslator
@@ -30,6 +31,7 @@ class Config {
     ConfigDto configDto;
     String baseUrl
     String configPath
+    String diffRef
 
     static Config from(String[] args){
         def config = new Config()
@@ -38,6 +40,9 @@ class Config {
         logger.debug("baseUrl: ${config.baseUrl}")
         config.configPath = cmd.getOptionValue("config", Paths.get(config.baseUrl, "kiwi.yaml").toAbsolutePath().toString())
         logger.debug("config file: ${config.configPath}")
+        if (cmd.hasOption("diffRef")){
+            config.diffRef = cmd.getOptionValue("diffRef", "develop")
+        }
         config.configDto = config.getYamlConfig()
         return config
     }
@@ -79,7 +84,12 @@ class Config {
                     ),
                     keyMap
             )
-            def filters = Kiwi.getDefaultFilters(this)
+
+            def filters = []
+            if(diffRef){
+                filters.add(GitDiffFilter.make(this))
+            }
+            filters.addAll(Kiwi.getDefaultFilters(this))
             def path = Paths.get(baseUrl, module.path)
             logger.info("module path: {}", path)
             logger.info("message path: {}", module.messageLocation)

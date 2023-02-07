@@ -12,7 +12,7 @@ import java.util.function.Predicate
  * @author zhouteng
  * @Date 2022/4/1
  */
-class ConstantFilter extends BaseFilter implements Predicate<StringLiteral>{
+class ConstantFilter extends BaseFilter {
     private final Logger logger = LoggerFactory.getLogger(ConstantFilter.class.name)
     private List<String> constant;
 
@@ -30,7 +30,7 @@ class ConstantFilter extends BaseFilter implements Predicate<StringLiteral>{
         return res
     }
 
-    boolean test(StringLiteral stringLiteral) {
-        return intercept(stringLiteral){ !constant.contains(it.getLiteralValue()) }
+    boolean test(Tuple2<StringLiteral, String> node) {
+        return intercept(node.getV1()){ !constant.contains(it.getLiteralValue()) }
     }
 }

@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  * @author zhouteng
  * @Date 2022/4/2
  */
-public class AnnotationFilter extends BaseFilter implements Predicate<StringLiteral> {
+public class AnnotationFilter extends BaseFilter {
     private final Logger logger = LoggerFactory.getLogger(AnnotationFilter.class.name)
 
     List<Tuple2<String, String>> excludeAnnotationList = [
@@ -50,8 +50,8 @@ public class AnnotationFilter extends BaseFilter implements Predicate<StringLite
         super(config)
     }
 
-    boolean test(StringLiteral stringLiteral) {
-        return intercept(stringLiteral) { !isInAnnotation(it) }
+    boolean test(Tuple2<StringLiteral, String> node) {
+        return intercept(node.getV1()) { !isInAnnotation(it) }
     }
 
     boolean intercept(StringLiteral stringLiteral, Closure<StringLiteral> closure){

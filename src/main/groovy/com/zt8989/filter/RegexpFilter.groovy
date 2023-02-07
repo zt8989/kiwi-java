@@ -12,7 +12,7 @@ import java.util.function.Predicate
  * @author zhouteng
  * @Date 2022/4/2
  */
-class RegexpFilter extends BaseFilter implements Predicate<StringLiteral> {
+class RegexpFilter extends BaseFilter  {
     private final Logger logger = LoggerFactory.getLogger(RegexpFilter.class.name)
     static final var REGEXP = ~/^[\s【】。, ，：()\\（）；、{}\d“”—–<>？！’‘…￥]+$/
 
@@ -29,9 +29,9 @@ class RegexpFilter extends BaseFilter implements Predicate<StringLiteral> {
         return res
     }
 
-    boolean test(StringLiteral stringLiteral) {
-        return intercept(stringLiteral) {
-            !stringLiteral.literalValue.matches(REGEXP)
+    boolean test(Tuple2<StringLiteral, String> node) {
+        return intercept(node.getV1()) {
+            !it.literalValue.matches(REGEXP)
         }
     }
 }

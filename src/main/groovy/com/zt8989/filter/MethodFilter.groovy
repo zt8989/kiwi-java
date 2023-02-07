@@ -15,7 +15,7 @@ import java.util.function.Predicate
 /**
  * @author zhouteng* @Date 2022/4/2
  */
-class MethodFilter extends BaseFilter implements Predicate<StringLiteral> {
+class MethodFilter extends BaseFilter  {
     private final Logger logger = LoggerFactory.getLogger(MethodFilter.class.name)
     final var methodComment = "kiwi-disable-method"
     CompilationUnit compilationUnit
@@ -35,8 +35,8 @@ class MethodFilter extends BaseFilter implements Predicate<StringLiteral> {
         return res
     }
 
-    boolean test(StringLiteral stringLiteral) {
-        def res = intercept(stringLiteral){ !hasMethodComment(it) }
+    boolean test(Tuple2<StringLiteral, String> node) {
+        def res = intercept(node.getV1()){ !hasMethodComment(it) }
         return res
     }
 
