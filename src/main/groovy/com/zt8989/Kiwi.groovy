@@ -34,7 +34,8 @@ public class Kiwi {
        return [new FunctionCallFilter(config), new AnnotationFilter(config), new RegexpFilter(config),
                new I18nFilter(config), new EnumFilter(config),
                new StringEqualsFilter(config), new MainFilter(config),
-               new ConstantFilter(config)
+               new ConstantFilter(config),
+               new FieldStringFilter(config)
        ]
     }
 

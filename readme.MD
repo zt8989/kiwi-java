@@ -21,7 +21,7 @@
 * 拼接的文案。"用户" + user.name + "不能为空"，会做占位符转换, 变成"用户{0}不能为空", 然后替换成对应的code
 * 注解中的文案。 @NotNull(message = "用户不能为空")，替换成@NotNull(message = "{user_name_not_empty}")
 * MessageFormat.format中的文案。MessageFormat.format("用户名{0}不能为空", user.name)替换成I18nUtils.getMessage("user_name_not_empty", new Object[]{ user.name })。
-* 字段中的字符串。private static String abc = "你好"替换成
+* 存在bug，暂时过滤。~~字段中的字符串。private static String abc = "你好"替换成~~
 ```java
 private String getAbc(){
   return I18nUtils.getMessage("hello")

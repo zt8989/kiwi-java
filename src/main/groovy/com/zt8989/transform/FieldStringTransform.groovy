@@ -2,6 +2,7 @@ package com.zt8989.transform
 
 import com.zt8989.config.Config
 import com.zt8989.translator.Translator
+import com.zt8989.util.AstUtils
 import org.eclipse.jdt.core.dom.*
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
 /**
@@ -14,16 +15,7 @@ public class FieldStringTransform extends AbstractTransform {
         super(astRewrite, compilationUnit, translator, config)
     }
 
-    Optional<FieldDeclaration> isFieldDeclaration(StringLiteral stringLiteral){
-        def parent = stringLiteral.getParent();
-        while (parent != null && !(parent instanceof TypeDeclaration)){
-            if(parent instanceof FieldDeclaration){
-                return Optional.of((FieldDeclaration)parent);
-            }
-            parent = parent.getParent();
-        }
-        return Optional.empty();
-    }
+
 
     void transformFieldToGetMethod(FieldDeclaration fieldDeclaration, StringLiteral stringLiteral){
         def method = ast.newMethodDeclaration();
@@ -72,7 +64,7 @@ public class FieldStringTransform extends AbstractTransform {
     public List<StringLiteral> transform(List<StringLiteral> stringLiterals) {
         def cloneList = stringLiterals.collect()
         for(stringLiteral in stringLiterals){
-            def field = isFieldDeclaration(stringLiteral);
+            def field = AstUtils.isFieldDeclaration(stringLiteral);
             if(field.isPresent()){
                 if(config.configDto.fieldTranslate){
                     transformFieldToGetMethod(field.get(), stringLiteral);

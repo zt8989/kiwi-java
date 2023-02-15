@@ -3,6 +3,7 @@ package com.zt8989.util
 
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
+import org.eclipse.jdt.core.dom.FieldDeclaration
 import org.eclipse.jdt.core.dom.MethodInvocation
 import org.eclipse.jdt.core.dom.SimpleName
 import org.eclipse.jdt.core.dom.StringLiteral
@@ -43,5 +44,16 @@ class AstUtils {
             parent = parent.getParent()
         }
         return Optional.empty()
+    }
+
+    static Optional<FieldDeclaration> isFieldDeclaration(StringLiteral stringLiteral){
+        def parent = stringLiteral.getParent();
+        while (parent != null && !(parent instanceof TypeDeclaration)){
+            if(parent instanceof FieldDeclaration){
+                return Optional.of((FieldDeclaration)parent);
+            }
+            parent = parent.getParent();
+        }
+        return Optional.empty();
     }
 }
