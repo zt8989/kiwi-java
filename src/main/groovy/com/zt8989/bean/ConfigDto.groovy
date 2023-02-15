@@ -15,6 +15,14 @@ class ConfigDto {
     boolean fieldTranslate = false
     String joiner;
     String prefix;
+    List<String> functionCallExcludes = []
+
+    List<String> getFunctionCallExcludes(){
+        return functionCallExcludes ?:[
+                "log.*",
+                "logger.*"
+        ]
+    }
 
     String getJoiner(){
         return joiner?:"_"

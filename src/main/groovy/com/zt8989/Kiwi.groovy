@@ -13,8 +13,6 @@ import org.eclipse.jface.text.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.util.function.Predicate
-
 public class Kiwi {
     private final Logger logger = LoggerFactory.getLogger(Kiwi.class.name)
 
@@ -33,7 +31,7 @@ public class Kiwi {
     private BiMap<String, String> keyMap;
 
     static List<BaseFilter> getDefaultFilters(Config config){
-       return [new LogInfoFilter(config), new AnnotationFilter(config), new RegexpFilter(config),
+       return [new FunctionCallFilter(config), new AnnotationFilter(config), new RegexpFilter(config),
                new I18nFilter(config), new EnumFilter(config),
                new StringEqualsFilter(config), new MainFilter(config),
                new ConstantFilter(config)
@@ -58,7 +56,7 @@ public class Kiwi {
         } catch(IllegalArgumentException e){
             throw new RuntimeException("预加载中是否包含相同的key, 且对应的中文不一致", e)
         }
-        def filter = this.filters.find(it -> it instanceof LogInfoFilter) as LogInfoFilter
+        def filter = this.filters.find(it -> it instanceof FunctionCallFilter) as FunctionCallFilter
         if(filter != null){
             filter.listeners.add({ StringLiteral it ->
                 if(keyMap.containsKey(it.literalValue)){

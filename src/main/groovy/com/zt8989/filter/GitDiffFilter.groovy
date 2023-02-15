@@ -6,15 +6,11 @@ import com.zt8989.git.DiffParser
 import com.zt8989.git.Git
 import com.zt8989.git.Info
 import com.zt8989.git.TypeEnum
-import org.codehaus.groovy.util.StringUtil
 import org.eclipse.jdt.core.dom.StringLiteral
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.function.Predicate
-
 
 class GitDiffFilter extends BaseFilter  {
     private static final Logger logger = LoggerFactory.getLogger(GitDiffFilter.class.name)
@@ -23,7 +19,7 @@ class GitDiffFilter extends BaseFilter  {
     static GitDiffFilter make(Config config){
         def dir = Paths.get(config.baseUrl)
         String content = null
-        Git.runCommand(dir, c -> content = c, c -> {}, "git", "diff", config.diffRef, "head")
+        Git.runCommand(dir, c -> content = c, c -> {}, "git", "diff", config.diffRef)
         if(Strings.isNullOrEmpty(content)){
             throw new Exception("git has no diff")
         }
