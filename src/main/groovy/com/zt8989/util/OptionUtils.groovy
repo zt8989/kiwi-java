@@ -32,9 +32,16 @@ class OptionUtils {
                 .desc("diff with branch[develop]")
                 .build()
 
+        def transformLog = Option.builder("log")
+                .argName("log")
+                .required(false)
+                .desc("transform log params form concat string into format string")
+                .build()
+
         options.addOption(config)
         options.addOption(baseUrl)
         options.addOption(diffRef)
+        options.addOption(transformLog)
         def cmd = parser.parse(options, args)
         return cmd
     }

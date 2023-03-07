@@ -3,12 +3,13 @@ package com.zt8989.config
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.zt8989.FileWalker
-import com.zt8989.Kiwi
 import com.zt8989.ResourceLoader
+import com.zt8989.base.Task
 import com.zt8989.bean.ConfigDto
 import com.zt8989.bean.MessageModule
-import com.zt8989.filter.ConstantFilter
 import com.zt8989.filter.GitDiffFilter
+import com.zt8989.task.TransformLogTask
+import com.zt8989.task.TranslationTask
 import com.zt8989.translator.BaiduTranslator
 import com.zt8989.translator.CachedKeyTranslator
 import com.zt8989.translator.KeyTranslator
@@ -32,6 +33,7 @@ class Config {
     String baseUrl
     String configPath
     String diffRef
+    boolean transformLog = false
 
     static Config from(String[] args){
         def config = new Config()
@@ -42,6 +44,9 @@ class Config {
         logger.debug("config file: ${config.configPath}")
         if (cmd.hasOption("diffRef")){
             config.diffRef = cmd.getOptionValue("diffRef", "develop")
+        }
+        if(cmd.hasOption("log")){
+            config.transformLog = true
         }
         config.configDto = config.getYamlConfig()
         return config
@@ -64,7 +69,7 @@ class Config {
         return configDto.BAIDU_API_KEY
     }
 
-    List<Kiwi> build(){
+    List<Task> build(){
         ConfigDto yaml = this.configDto
         List<MessageModule> modules = yaml.modules
         List<String> fileExcludes = yaml.fileExcludes
@@ -89,13 +94,13 @@ class Config {
             if(diffRef){
                 filters.add(GitDiffFilter.make(this))
             }
-            filters.addAll(Kiwi.getDefaultFilters(this))
+            filters.addAll(TranslationTask.getDefaultFilters(this))
             def path = Paths.get(baseUrl, module.path)
             logger.info("module path: {}", path)
             logger.info("message path: {}", module.messageLocation)
             def resourceLoader = new ResourceLoader(Paths.get(baseUrl, module.messageLocation, "messages_zh_CN.properties").toFile().path)
             def fileWalker = new FileWalker(location: path, excludeList: fileExcludes)
-            translateList.add(new Kiwi(
+            translateList.add(new TranslationTask(
                     translator,
                     resourceLoader,
                     fileWalker,
