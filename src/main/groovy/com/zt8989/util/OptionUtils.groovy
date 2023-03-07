@@ -32,8 +32,8 @@ class OptionUtils {
                 .desc("diff with branch[develop]")
                 .build()
 
-        def transformLog = Option.builder("log")
-                .argName("log")
+        def transformLog = Option.builder("transformLog")
+                .argName("transformLog")
                 .required(false)
                 .desc("transform log params form concat string into format string")
                 .build()

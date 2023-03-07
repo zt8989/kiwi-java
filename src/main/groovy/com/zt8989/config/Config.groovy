@@ -8,6 +8,8 @@ import com.zt8989.base.Task
 import com.zt8989.bean.ConfigDto
 import com.zt8989.bean.MessageModule
 import com.zt8989.filter.GitDiffFilter
+import com.zt8989.log.filter.FunctionCallFilter
+import com.zt8989.log.filter.InfixExpressionFilter
 import com.zt8989.task.TransformLogTask
 import com.zt8989.task.TranslationTask
 import com.zt8989.translator.BaiduTranslator
@@ -45,7 +47,7 @@ class Config {
         if (cmd.hasOption("diffRef")){
             config.diffRef = cmd.getOptionValue("diffRef", "develop")
         }
-        if(cmd.hasOption("log")){
+        if(cmd.hasOption("transformLog")){
             config.transformLog = true
         }
         config.configDto = config.getYamlConfig()
@@ -70,46 +72,68 @@ class Config {
     }
 
     List<Task> build(){
-        ConfigDto yaml = this.configDto
-        List<MessageModule> modules = yaml.modules
-        List<String> fileExcludes = yaml.fileExcludes
-        def translateList = []
-        BiMap<String, String> keyMap = HashBiMap.create()
-        for(int i=0;i< modules.size(); i++){
-            def module = modules.get(i)
-            List<Path> fileLists = getMessageSourceList()
-            def translator = new CachedKeyTranslator(
-                    new MessageSourcesTranslator(
-                            new KeyTranslator(
-                                    new BaiduTranslator(this),
-                                    yaml.joiner,
-                                    yaml.prefix
-                            ),
-                            fileLists
-                    ),
-                    keyMap
-            )
-
-            def filters = []
-            if(diffRef){
-                filters.add(GitDiffFilter.make(this))
+        if(transformLog){
+            ConfigDto yaml = this.configDto
+            List<MessageModule> modules = yaml.modules
+            List<String> fileExcludes = yaml.fileExcludes
+            def translateList = []
+            def filters = [
+                    new FunctionCallFilter(),
+                    new InfixExpressionFilter(),
+            ]
+            for (int i = 0; i < modules.size(); i++) {
+                def module = modules.get(i)
+                def path = Paths.get(baseUrl, module.path)
+                def fileWalker = new FileWalker(location: path, excludeList: fileExcludes)
+                translateList.add(new TransformLogTask(
+                        fileWalker,
+                        filters,
+                        this,
+                ))
             }
-            filters.addAll(TranslationTask.getDefaultFilters(this))
-            def path = Paths.get(baseUrl, module.path)
-            logger.info("module path: {}", path)
-            logger.info("message path: {}", module.messageLocation)
-            def resourceLoader = new ResourceLoader(Paths.get(baseUrl, module.messageLocation, "messages_zh_CN.properties").toFile().path)
-            def fileWalker = new FileWalker(location: path, excludeList: fileExcludes)
-            translateList.add(new TranslationTask(
-                    translator,
-                    resourceLoader,
-                    fileWalker,
-                    filters,
-                    this,
-                    keyMap
-            ))
+            return translateList
+        } else {
+            ConfigDto yaml = this.configDto
+            List<MessageModule> modules = yaml.modules
+            List<String> fileExcludes = yaml.fileExcludes
+            def translateList = []
+            BiMap<String, String> keyMap = HashBiMap.create()
+            for (int i = 0; i < modules.size(); i++) {
+                def module = modules.get(i)
+                List<Path> fileLists = getMessageSourceList()
+                def translator = new CachedKeyTranslator(
+                        new MessageSourcesTranslator(
+                                new KeyTranslator(
+                                        new BaiduTranslator(this),
+                                        yaml.joiner,
+                                        yaml.prefix
+                                ),
+                                fileLists
+                        ),
+                        keyMap
+                )
+
+                def filters = []
+                if (diffRef) {
+                    filters.add(GitDiffFilter.make(this))
+                }
+                filters.addAll(TranslationTask.getDefaultFilters(this))
+                def path = Paths.get(baseUrl, module.path)
+                logger.info("module path: {}", path)
+                logger.info("message path: {}", module.messageLocation)
+                def resourceLoader = new ResourceLoader(Paths.get(baseUrl, module.messageLocation, "messages_zh_CN.properties").toFile().path)
+                def fileWalker = new FileWalker(location: path, excludeList: fileExcludes)
+                translateList.add(new TranslationTask(
+                        translator,
+                        resourceLoader,
+                        fileWalker,
+                        filters,
+                        this,
+                        keyMap
+                ))
+            }
+            return translateList
         }
-        return translateList
     }
 
     public ConfigDto getYamlConfig() {
