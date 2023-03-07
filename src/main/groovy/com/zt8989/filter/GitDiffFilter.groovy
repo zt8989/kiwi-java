@@ -24,7 +24,9 @@ class GitDiffFilter extends BaseFilter  {
             throw new Exception("git has no diff")
         }
         def parser = new DiffParser()
-        def infoList = parser.parse(content).findAll({ it.type == TypeEnum.modify.type || it.type == TypeEnum.add.type })
+        def infoList = parser.parse(content)
+                .findAll({ it.type == TypeEnum.modify.type || it.type == TypeEnum.add.type })
+                .findAll({ it.newPath != null })
         return new GitDiffFilter(config, infoList)
     }
 
