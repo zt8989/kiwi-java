@@ -2,13 +2,16 @@ package com.zt8989.transform
 
 import com.zt8989.bean.ConfigDto
 import com.zt8989.config.Config
+import com.zt8989.exception.NoTranslateFoundException
 import com.zt8989.translator.Translator
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.CompilationUnit
 import org.eclipse.jdt.core.dom.MethodInvocation
 import org.eclipse.jdt.core.dom.StringLiteral
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory;
 
 /**
  * @author zhouteng
@@ -23,6 +26,8 @@ public abstract class AbstractTransform {
     AST getAst(){
         return compilationUnit.getAST();
     }
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractTransform.class.name)
 
     AbstractTransform(ASTRewrite astRewrite, CompilationUnit compilationUnit, Translator translator, Config config){
         this.astRewrite = astRewrite

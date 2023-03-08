@@ -1,6 +1,7 @@
 package com.zt8989.transform
 
 import com.zt8989.config.Config
+import com.zt8989.exception.NoTranslateFoundException
 import com.zt8989.translator.Translator
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.CompilationUnit
@@ -19,11 +20,15 @@ class StringTransform extends AbstractTransform{
 
     List<StringLiteral> transform(List<StringLiteral> stringLiterals) {
         for(stringLiteral in stringLiterals){
-            convertStringLiteral([stringLiteral].collect {
-                StringLiteral node = ASTNode.copySubtree(it.parent.AST, it)
-                translateKey(node)
-                return node
-            }, stringLiteral)
+            try {
+                convertStringLiteral([stringLiteral].collect {
+                    StringLiteral node = ASTNode.copySubtree(it.parent.AST, it)
+                    translateKey(node)
+                    return node
+                }, stringLiteral)
+            } catch (NoTranslateFoundException ex){
+
+            }
         }
         return []
     }

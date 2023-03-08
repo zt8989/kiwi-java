@@ -2,6 +2,7 @@ package com.zt8989.transform
 
 import com.zt8989.bean.MuteInt
 import com.zt8989.config.Config
+import com.zt8989.exception.NoTranslateFoundException
 import com.zt8989.translator.Translator
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.CompilationUnit
@@ -68,7 +69,11 @@ class ConcatStringTransform extends StringTransform{
         def args = []
         def code = ast.newStringLiteral()
         code.setLiteralValue(constant.join())
-        translateKey(code)
+        try {
+            translateKey(code)
+        } catch (NoTranslateFoundException ex){
+            return
+        }
 
         args.add(code)
         def array = ast.newArrayCreation()

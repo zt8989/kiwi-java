@@ -1,6 +1,7 @@
 package com.zt8989.transform
 
 import com.zt8989.config.Config
+import com.zt8989.exception.NoTranslateFoundException
 import com.zt8989.translator.Translator
 import com.zt8989.util.AstUtils
 import org.eclipse.jdt.core.dom.*
@@ -33,7 +34,12 @@ public class FieldStringTransform extends AbstractTransform {
         def returnType = ast.newReturnStatement()
         body.statements().add(returnType);
         StringLiteral node = ASTNode.copySubtree(stringLiteral.getAST(), stringLiteral)
-        translateKey(node)
+        try {
+            translateKey(node)
+        } catch (NoTranslateFoundException ex){
+            return
+        }
+
         returnType.expression = getI18nCall([node])
         astRewrite.replace(fieldDeclaration, method, null)
 

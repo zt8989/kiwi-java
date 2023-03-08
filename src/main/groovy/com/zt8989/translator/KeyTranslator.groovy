@@ -1,5 +1,6 @@
 package com.zt8989.translator
 
+import com.google.common.collect.Sets
 import com.zt8989.exception.NoTranslateFoundException
 
 /**
@@ -13,11 +14,13 @@ class KeyTranslator implements Translator{
     Integer maxKeyWordCount = 10
     String joiner
     String prefix
+    Set<String> sameTranslateSet;
 
     KeyTranslator(Translator translator, String joiner, String prefix) {
         this.translator = translator;
         this.joiner = joiner
         this.prefix = prefix
+        this.sameTranslateSet = Sets.newHashSet()
     }
 
     List<String> translateKeys(String cn){
@@ -39,10 +42,14 @@ class KeyTranslator implements Translator{
     }
 
     Optional<String> translate(String cn) {
-        def keys = translateKeys(cn)
-        if(keys.size() > 0){
-            def key = getKey(keys)
-            return Optional.of(key)
+        if(!sameTranslateSet.contains(cn)){
+            def keys = translateKeys(cn)
+            if(keys.size() > 0){
+                def key = getKey(keys)
+                return Optional.of(key)
+            } else {
+                sameTranslateSet.add(cn)
+            }
         }
         throw new NoTranslateFoundException("no translate key found for " + cn)
     }

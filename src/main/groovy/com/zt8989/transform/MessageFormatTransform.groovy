@@ -2,6 +2,7 @@ package com.zt8989.transform
 
 import com.zt8989.bean.MuteInt
 import com.zt8989.config.Config
+import com.zt8989.exception.NoTranslateFoundException
 import com.zt8989.translator.Translator
 import com.zt8989.util.AstUtils
 import org.eclipse.jdt.core.dom.ASTNode
@@ -32,7 +33,11 @@ class MessageFormatTransform extends AbstractTransform{
         value = replaceMessageFormatWithI18nFormat(value)
         code.setEscapedValue(value)
 
-        translateKey(code)
+        try {
+            translateKey(code)
+        } catch (NoTranslateFoundException ex){
+            return
+        }
 
         List<ASTNode> retainExp = methodInvocation.arguments().subList(1, methodInvocation.arguments().size())
             .collect({ ASTNode.copySubtree(methodInvocation.getAST(), (ASTNode)it) })
