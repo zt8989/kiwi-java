@@ -3,12 +3,16 @@ package com.zt8989.filter
 
 import com.zt8989.config.Config
 import com.zt8989.util.AstUtils
+import com.zt8989.util.GlobUtils
 import org.eclipse.jdt.core.dom.FieldAccess
 import org.eclipse.jdt.core.dom.MethodInvocation
+import org.eclipse.jdt.core.dom.QualifiedName
 import org.eclipse.jdt.core.dom.SimpleName
 import org.eclipse.jdt.core.dom.StringLiteral
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import java.util.regex.Pattern
 
 /**
  * @author zhouteng* @Date 2022/4/1
@@ -16,14 +20,13 @@ import org.slf4j.LoggerFactory
 class FunctionCallFilter extends BaseFilter  {
     private final Logger logger = LoggerFactory.getLogger(FunctionCallFilter.class.name)
     List<Closure<StringLiteral>> listeners = []
-    private List<Tuple2<String, String>> functionCallExcludes
+    private Map<String, Pattern> functionCallExcludes
 
 
     FunctionCallFilter(Config config) {
         super(config)
-        functionCallExcludes = config.yamlConfig.getFunctionCallExcludes().collect({
-            def fieldMethod = it.split("\\.")
-            new Tuple2<>(fieldMethod[0], fieldMethod[1])
+        functionCallExcludes = config.yamlConfig.getFunctionCallExcludes().collectEntries({
+            [it, Pattern.compile(GlobUtils.createRegexFromGlob(it))]
         })
     }
 
@@ -42,50 +45,36 @@ class FunctionCallFilter extends BaseFilter  {
         return res
     }
 
-    Optional<Tuple2<String, String>> isSameIdentifierName(String name) {
-        Optional.ofNullable(functionCallExcludes.find {
-            (it.getV1() == name)
-        })
-    }
-
     boolean lookupUntil(StringLiteral stringLiteral){
         def optMethod = AstUtils.lookupUntilASTNode(stringLiteral, MethodInvocation.class)
         if(optMethod.isPresent()){
-            def expression = optMethod.get().getExpression()
-            def methodName = optMethod.get().name
-            // log.info(xxx)
-            if(expression instanceof SimpleName){
-                def simpleName = (SimpleName)expression
-                return shouldMethodFilter(simpleName, methodName, stringLiteral)
-                // this.log.info(xxx)
-            } else if(expression instanceof  FieldAccess){
-                def fieldAccess = (FieldAccess)expression
+            def method = optMethod.get()
+            def expression = method.getExpression()
+            def methodName = method.name
+            // this.log.info(xxx)
+            if(expression instanceof  FieldAccess){
+                def fieldAccess = (FieldAccess) expression
                 def fieldName = fieldAccess.getName()
-                return shouldMethodFilter(fieldName, methodName, stringLiteral)
+                return shouldMethodFilter("${fieldName}.${methodName}",stringLiteral)
+            } else {
+                return shouldMethodFilter("${expression}.${methodName}", stringLiteral)
             }
         }
         return false
     }
 
-    def boolean shouldMethodFilter(SimpleName simpleName, SimpleName methodName, StringLiteral stringLiteral) {
-        def match = isSameIdentifierName(simpleName.getIdentifier())
-        return shouldMethodFilter(match, methodName).tap {
-            if(it){
+    def boolean shouldMethodFilter(String name, StringLiteral stringLiteral) {
+        return shouldMethodFilter(name).tap {
+            if(it.isPresent()){
                 logger.info("过滤: {}", stringLiteral.literalValue)
-                logger.info("过滤原因: 方法请求过滤规则[" + match.get().join(".") + "]")
+                logger.info("过滤原因: 方法请求过滤规则[" + it.get().key + "]")
             }
-        }
+        }.map({ true }).orElse(false)
     }
 
-    def boolean shouldMethodFilter(Optional<Tuple2<String, String>> match, SimpleName methodName) {
-        if (match.isPresent()) {
-            if (match.get().getV2() == "*") {
-                return true
-            }
-            if (methodName instanceof SimpleName && match.get().getV2() == methodName.getIdentifier()) {
-                return true
-            }
-        }
-        return false
+    def shouldMethodFilter(String name) {
+        Optional.ofNullable(functionCallExcludes.find {
+            name.matches(it.value)
+        })
     }
 }

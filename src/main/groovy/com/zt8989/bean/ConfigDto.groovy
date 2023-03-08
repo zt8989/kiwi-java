@@ -20,7 +20,8 @@ class ConfigDto {
     List<String> getFunctionCallExcludes(){
         return functionCallExcludes ?:[
                 "log.*",
-                "logger.*"
+                "logger.*",
+                "System.out.*"
         ]
     }
 
